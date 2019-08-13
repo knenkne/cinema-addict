@@ -1,7 +1,9 @@
-// Genres
-const generateFilmGenreTemplate = (genre) => `<span class="film-details__genre">${genre}</span>`.trim();
+import {controls} from './film-card';
 
-const generateFilmGenresTemplate = (genres) => genres.map((genre) => generateFilmGenreTemplate(genre)).join(``);
+// Genres
+const generateFilmGenreTemplate = (genre) => `<span class="film-details__genre">${genre}</span>`;
+
+const generateFilmGenresTemplate = (genres) => genres.map(generateFilmGenreTemplate).join(``);
 
 const generateFilmGenresBlockTemplate = (genres) => {
   const filmGenresBlockTemplate =
@@ -14,9 +16,61 @@ const generateFilmGenresBlockTemplate = (genres) => {
   return filmGenresBlockTemplate;
 };
 
+// Controls
+const generateFilmControlTemplate = ({name}, isActive) =>
+  `<input type="checkbox" class="film-details__control-input visually-hidden" id="${name}" name="${name}" ${isActive ? `checked` : ``}>
+  <label for="${name}" class="film-details__control-label film-details__control-label--${name}">Add to ${name}</label>`.trim();
+
+const generateFilmControlsTemplate = (items, isActive) => items.map((item, index) => generateFilmControlTemplate(item, isActive[index])).join(``);
+
+const generateFilmControlsBlockTemplate = (items, isActive) => {
+  const filmControlsBlockTemplate =
+  `<section class="film-details__controls">
+  ${generateFilmControlsTemplate(items, isActive)}
+  </section>`.trim();
+
+  return filmControlsBlockTemplate;
+};
+
+
+// Rating
+const generateFilmScoreTemplate = (score, userScore) =>
+  `<input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="${score}" id="rating-${score}" ${userScore === score ? `checked` : ``}>
+  <label class="film-details__user-rating-label" for="rating-${score}">${score}</label>`.trim();
+
+const generateFilmScoresTemplate = (scores, userScore) => [...Array(scores)].map((score, index) => generateFilmScoreTemplate(index + 1, userScore)).join(``);
+
+const generateFilmRatingTemplate = (name, image, userScore) => {
+  const filmRatingTemplate =
+    `<div class="form-details__middle-container">
+    <section class="film-details__user-rating-wrap">
+      <div class="film-details__user-rating-controls">
+        <button class="film-details__watched-reset" type="button">Undo</button>
+      </div>
+  
+      <div class="film-details__user-score">
+        <div class="film-details__user-rating-poster">
+          <img src="./images/posters/${image}" alt="${name}" class="film-details__user-rating-img">
+        </div>
+  
+        <section class="film-details__user-rating-inner">
+          <h3 class="film-details__user-rating-title">${name}</h3>
+  
+          <p class="film-details__user-rating-feelings">How you feel it?</p>
+  
+          <div class="film-details__user-rating-score">
+          ${generateFilmScoresTemplate(9, userScore)}
+          </div>
+        </section>
+      </div>
+    </section>
+  </div>`.trim();
+
+  return filmRatingTemplate;
+};
+
 // Comments
-const generateFilmCommentTemplate = ({author, comment, reaction, ago}) => {
-  const filmCommentTemplate =
+const generateFilmCommentTemplate = ({author, comment, reaction, ago}) =>
   `<li class="film-details__comment">
   <span class="film-details__comment-emoji">
     <img src="./images/emoji/${reaction}.png" width="55" height="55" alt="emoji">
@@ -30,9 +84,6 @@ const generateFilmCommentTemplate = ({author, comment, reaction, ago}) => {
     </p>
   </div>
 </li>`.trim();
-
-  return filmCommentTemplate;
-};
 
 const generateFilmCommentsTemplate = (comments) => comments.map((comment) => generateFilmCommentTemplate(comment)).join(``);
 
@@ -56,6 +107,10 @@ const generateFilmCardDetailsTemplate = ({
   genres,
   description,
   comments,
+  isAdded,
+  isWatched,
+  isFavorite,
+  userScore,
   director,
   writers,
   actors,
@@ -84,6 +139,7 @@ const generateFilmCardDetailsTemplate = ({
 
             <div class="film-details__rating">
               <p class="film-details__total-rating">${rating}</p>
+              ${isWatched ? `<p class="film-details__user-rating">Your rate ${userScore}</p>` : ``}
             </div>
           </div>
 
@@ -121,17 +177,10 @@ const generateFilmCardDetailsTemplate = ({
         </div>
       </div>
 
-      <section class="film-details__controls">
-        <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist">
-        <label for="watchlist" class="film-details__control-label film-details__control-label--watchlist">Add to watchlist</label>
-
-        <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched">
-        <label for="watched" class="film-details__control-label film-details__control-label--watched">Already watched</label>
-
-        <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite">
-        <label for="favorite" class="film-details__control-label film-details__control-label--favorite">Add to favorites</label>
-      </section>
+      ${generateFilmControlsBlockTemplate(controls, [isAdded, isWatched, isFavorite])}
     </div>
+
+    ${isWatched ? generateFilmRatingTemplate(name, image, userScore) : ``}
 
     <div class="form-details__bottom-container">
       <section class="film-details__comments-wrap">
@@ -176,6 +225,4 @@ const generateFilmCardDetailsTemplate = ({
   return filmCardDetailsTemplate;
 };
 
-export {
-  generateFilmCardDetailsTemplate
-};
+export {generateFilmCardDetailsTemplate};

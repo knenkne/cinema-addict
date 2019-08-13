@@ -29,16 +29,16 @@ const navigates = [{
   isActive: false
 }];
 
-const generateCountTemplate = (count) => (count && count !== 0) ? `<span class="main-navigation__item-count">${count}</span>` : ``;
+const generateCountTemplate = (count) => (count) ? `<span class="main-navigation__item-count">${count}</span>` : ``;
 
 const generateNavigationItemTemplate = ({name, title, isActive, count}) => {
   const navigationItemTemplate =
-  `<a href="#${name}" class="main-navigation__item${isActive ? ` main-navigation__item--active` : ``}">${title} ${generateCountTemplate(count)}</a>`.trim();
+  `<a href="#${name}" class="main-navigation__item${name === `stats` ? ` main-navigation__item--additional` : ``}${isActive ? ` main-navigation__item--active` : ``}">${title} ${generateCountTemplate(count)}</a>`.trim();
 
   return navigationItemTemplate;
 };
 
-const generateNavigationItemsTemplate = (items) => items.map((item) => generateNavigationItemTemplate(item)).join(``);
+const generateNavigationItemsTemplate = (items) => items.map(generateNavigationItemTemplate).join(``);
 
 const generateNavigationTemplate = (items) => {
   const navigationTemplate =

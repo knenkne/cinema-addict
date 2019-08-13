@@ -32,19 +32,18 @@ const filmsContainer = renderContainer(`section`, [`films`], main);
 renderComponent(generateFilmListTemplate(films), filmsContainer);
 
 // Extra films
-const sortFilms = (by) => {
-  const filmsCopy = films;
-  let sortedFilms = [];
-  switch (by) {
-    case (`rating`):
-      sortedFilms = filmsCopy.sort((a, b) => b[by] - a[by]);
-      break;
-    case `comments`:
-      sortedFilms = filmsCopy.sort((a, b) => b[by].length - a[by].length);
-      break;
+const filmComparatorMap = {
+  rating(a, b) {
+    return b.rating - a.rating;
+  },
+  comments(a, b) {
+    return b.comments.length - a.comments.length;
   }
+};
 
-  return sortedFilms;
+const sortFilms = (by) => {
+  const filmsCopy = [...films];
+  return filmsCopy.sort(filmComparatorMap[by]);
 };
 
 // Top rated
